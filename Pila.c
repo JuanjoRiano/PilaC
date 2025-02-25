@@ -1,110 +1,74 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#define MAX_LENGTH 100  // Tamaño máximo para las cadenas
+#define MAX 100  // Tamaño máximo de la pila
 
-// Definición del nodo
-typedef struct Nodo {
-    char dato[MAX_LENGTH];
-    struct Nodo* siguiente;
-} Nodo;
-
-// Definición de la pila
+// Definición de la estructura de la pila
 typedef struct {
-    Nodo* cima;
-    int tamaño;
+    int datos[MAX]; // Arreglo para almacenar los datos
+    int tope;       // Índice del tope de la pila
 } Pila;
 
 // Función para inicializar la pila
-void inicializarPila(Pila* pila) {
-    pila->cima = NULL;
-    pila->tamaño = 0;
+void inicializar(Pila *p) {
+    p->tope = -1;
 }
 
 // Función para verificar si la pila está vacía
-int estaVacia(Pila* pila) {
-    return pila->cima == NULL;
+int estaVacia(Pila *p) {
+    return p->tope == -1;
 }
 
-// Función para obtener el tamaño de la pila
-int obtenerTamaño(Pila* pila) {
-    return pila->tamaño;
+// Función para verificar si la pila está llena
+int estaLlena(Pila *p) {
+    return p->tope == MAX - 1;
 }
 
-// Función para apilar (push)
-void apilar(Pila* pila, const char* dato) {
-    Nodo* nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
-    if (nuevoNodo == NULL) {
-        printf("Error de memoria\n");
+// Función para agregar un elemento a la pila
+void push(Pila *p, int valor) {
+    if (estaLlena(p)) {
+        printf("Error: la pila está llena\n");
         return;
     }
-    strncpy(nuevoNodo->dato, dato, MAX_LENGTH - 1);
-    nuevoNodo->dato[MAX_LENGTH - 1] = '\0'; // Asegurar terminación nula
-    nuevoNodo->siguiente = pila->cima;
-    pila->cima = nuevoNodo;
-    pila->tamaño++;
+    p->tope++;
+    p->datos[p->tope] = valor;
 }
 
-// Función para desapilar (pop)
-void desapilar(Pila* pila) {
-    if (estaVacia(pila)) {
-        printf("La pila está vacía, no se puede desapilar\n");
-        return;
+// Función para sacar un elemento de la pila
+int pop(Pila *p) {
+    if (estaVacia(p)) {
+        printf("Error: la pila está vacía\n");
+        return -1; 
     }
-    Nodo* temp = pila->cima;
-    pila->cima = pila->cima->siguiente;
-    free(temp);
-    pila->tamaño--;
+    int valor = p->datos[p->tope];
+    p->tope--;
+    return valor;
 }
 
-// Función para obtener el elemento en la cima (peek)
-char* cima(Pila* pila) {
-    if (estaVacia(pila)) {
-        return NULL;
+// Función para ver el elemento en la cima sin sacarlo
+int peek(Pila *p) {
+    if (estaVacia(p)) {
+        printf("Error: la pila está vacía\n");
+        return -1;
     }
-    return pila->cima->dato;
-}
-
-// Función para limpiar la pila
-void limpiarPila(Pila* pila) {
-    while (!estaVacia(pila)) {
-        desapilar(pila);
-    }
-}
-
-// Función para imprimir la pila (de arriba hacia abajo)
-void imprimirPila(Pila* pila) {
-    Nodo* actual = pila->cima;
-    printf("Pila:\n");
-    while (actual != NULL) {
-        printf("%s\n", actual->dato);
-        actual = actual->siguiente;
-    }
-    printf("----\n");
+    return p->datos[p->tope];
 }
 
 // Función principal para probar la pila
 int main() {
-    Pila pila;
-    inicializarPila(&pila);
+    Pila miPila;
+    inicializar(&miPila);
 
-    apilar(&pila, "Uno");
-    apilar(&pila, "Dos");
-    apilar(&pila, "Tres");
+    push(&miPila, 10);
+    push(&miPila, 20);
+    push(&miPila, 30);
 
-    imprimirPila(&pila);
+    printf("Elemento en la cima: %d\n", peek(&miPila));
 
-    printf("Cima de la pila: %s\n", cima(&pila));
-    printf("Tamaño de la pila: %d\n", obtenerTamaño(&pila));
+    printf("Sacando elementos: %d\n", pop(&miPila));
+    printf("Sacando elementos: %d\n", pop(&miPila));
 
-    desapilar(&pila);
-    imprimirPila(&pila);
-    printf("Tamaño después de desapilar: %d\n", obtenerTamaño(&pila));
-
-    limpiarPila(&pila);
-    printf("Pila limpiada. ¿Está vacía? %s\n", estaVacia(&pila) ? "Sí" : "No");
+    printf("Elemento en la cima: %d\n", peek(&miPila));
 
     return 0;
 }
-
