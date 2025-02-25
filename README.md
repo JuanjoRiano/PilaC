@@ -113,16 +113,6 @@ En esta función:
 3. Se muestra el elemento en la cima.
 4. Se extraen elementos y se imprime el resultado.
 
-## Cómo Compilar y Ejecutar
-1. Guarda el código en un archivo, por ejemplo, `pila.c`.
-2. Abre una terminal y compila el código con:
-   ```sh
-   gcc pila.c -o pila
-   ```
-3. Ejecuta el programa con:
-   ```sh
-   ./pila
-   ```
 
 ## Ejemplo de Salida
 ```
@@ -132,8 +122,4 @@ Sacando elementos: 20
 Elemento en la cima: 10
 ```
 
-## Conclusión
-Este código implementa una pila en C de manera simple y eficiente, sin depender de archivos de cabecera adicionales. Se incluyen todas las funciones básicas para manejar la estructura de datos tipo LIFO, permitiendo almacenar y gestionar valores enteros de forma estructurada.
-
-¡Espero que este README te ayude a comprender mejor la implementación! 🚀
 
