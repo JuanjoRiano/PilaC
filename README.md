@@ -1,192 +1,139 @@
-# Pila en C (Stack)
+# Implementación de una Pila en C
 
-Este proyecto es una implementación de una **pila (stack) en C** utilizando **listas enlazadas** para almacenar **cadenas de texto (********`char*`********)**. No se usan archivos de cabecera, por lo que todo el código está en un solo archivo para facilitar su uso.
+Este proyecto implementa una pila en el lenguaje C sin utilizar bibliotecas de cabecera externas, excepto `stdio.h` y `stdlib.h`. Todas las funciones y la estructura de datos están en un solo archivo, cumpliendo con los requisitos de no usar `string.h` ni archivos separados.
 
-## 📌 Características
+## Descripción
+Una **pila** (stack) es una estructura de datos de tipo LIFO (*Last In, First Out*), donde el último elemento agregado es el primero en ser retirado.
 
-- **Estructura de datos tipo pila** implementada con listas enlazadas.
-- **Funciones básicas:**
-  - `apilar()` (Push) → Agregar un elemento.
-  - `desapilar()` (Pop) → Eliminar el elemento superior.
-  - `cima()` (Peek) → Obtener el elemento superior sin eliminarlo.
-  - `estaVacia()` (isEmpty) → Verificar si la pila está vacía.
-  - `obtenerTamaño()` (Size) → Obtener el número de elementos en la pila.
-  - `limpiarPila()` (Clear) → Vaciar la pila completamente.
-  - `imprimirPila()` → Mostrar el contenido de la pila.
-- **Gestión de memoria dinámica** con `malloc()` y `free()`.
+Las operaciones básicas de la pila incluyen:
+- **Push**: Insertar un elemento en la cima de la pila.
+- **Pop**: Retirar el elemento superior de la pila.
+- **Peek**: Obtener el valor del elemento superior sin retirarlo.
+- **isEmpty**: Comprobar si la pila está vacía.
+- **isFull**: Comprobar si la pila está llena.
 
-## 📂 Estructura del Código
+## Estructura del Código
+El código está estructurado en las siguientes partes:
 
+### 1. Definición de la Estructura `Pila`
 ```c
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define MAX 100
 
-#define MAX_LENGTH 100  // Tamaño máximo para las cadenas
-
-// Definición del nodo
-typedef struct Nodo {
-    char dato[MAX_LENGTH];
-    struct Nodo* siguiente;
-} Nodo;
-
-// Definición de la pila
 typedef struct {
-    Nodo* cima;
-    int tamaño;
+    int datos[MAX]; // Arreglo donde se almacenan los datos de la pila
+    int tope;       // Índice del elemento en la cima
 } Pila;
 ```
 
-### 🔹 Inicialización de la pila
-
+### 2. Funciones de la Pila
+#### a) Inicializar la Pila
 ```c
-void inicializarPila(Pila* pila) {
-    pila->cima = NULL;
-    pila->tamaño = 0;
+void inicializar(Pila *p) {
+    p->tope = -1;
 }
 ```
+Esta función establece el índice `tope` en `-1`, indicando que la pila está vacía.
 
-### 🔹 Verificar si la pila está vacía
-
+#### b) Verificar si la Pila está Vacía
 ```c
-int estaVacia(Pila* pila) {
-    return pila->cima == NULL;
+int estaVacia(Pila *p) {
+    return p->tope == -1;
 }
 ```
+Devuelve `1` si la pila está vacía y `0` en caso contrario.
 
-### 🔹 Obtener el tamaño de la pila
-
+#### c) Verificar si la Pila está Llena
 ```c
-int obtenerTamaño(Pila* pila) {
-    return pila->tamaño;
+int estaLlena(Pila *p) {
+    return p->tope == MAX - 1;
 }
 ```
+Devuelve `1` si la pila está llena y `0` en caso contrario.
 
-### 🔹 Apilar un elemento
-
+#### d) Insertar un Elemento (`push`)
 ```c
-void apilar(Pila* pila, const char* dato) {
-    Nodo* nuevoNodo = (Nodo*)malloc(sizeof(Nodo));
-    if (nuevoNodo == NULL) {
-        printf("Error de memoria\n");
+void push(Pila *p, int valor) {
+    if (estaLlena(p)) {
+        printf("Error: la pila está llena\n");
         return;
     }
-    strncpy(nuevoNodo->dato, dato, MAX_LENGTH - 1);
-    nuevoNodo->dato[MAX_LENGTH - 1] = '\0';
-    nuevoNodo->siguiente = pila->cima;
-    pila->cima = nuevoNodo;
-    pila->tamaño++;
+    p->tope++;
+    p->datos[p->tope] = valor;
 }
 ```
+Si la pila no está llena, aumenta el índice `tope` y almacena el nuevo valor en esa posición.
 
-### 🔹 Desapilar un elemento
-
+#### e) Extraer un Elemento (`pop`)
 ```c
-void desapilar(Pila* pila) {
-    if (estaVacia(pila)) {
-        printf("La pila está vacía\n");
-        return;
+int pop(Pila *p) {
+    if (estaVacia(p)) {
+        printf("Error: la pila está vacía\n");
+        return -1;
     }
-    Nodo* temp = pila->cima;
-    pila->cima = pila->cima->siguiente;
-    free(temp);
-    pila->tamaño--;
+    int valor = p->datos[p->tope];
+    p->tope--;
+    return valor;
 }
 ```
+Si la pila no está vacía, se obtiene el elemento superior y se reduce el índice `tope`.
 
-### 🔹 Obtener el elemento superior (sin eliminarlo)
-
+#### f) Obtener el Elemento en la Cima (`peek`)
 ```c
-char* cima(Pila* pila) {
-    if (estaVacia(pila)) {
-        return NULL;
+int peek(Pila *p) {
+    if (estaVacia(p)) {
+        printf("Error: la pila está vacía\n");
+        return -1;
     }
-    return pila->cima->dato;
+    return p->datos[p->tope];
 }
 ```
+Devuelve el valor del elemento superior sin modificar la pila.
 
-### 🔹 Limpiar la pila completamente
-
-```c
-void limpiarPila(Pila* pila) {
-    while (!estaVacia(pila)) {
-        desapilar(pila);
-    }
-}
-```
-
-### 🔹 Imprimir el contenido de la pila
-
-```c
-void imprimirPila(Pila* pila) {
-    Nodo* actual = pila->cima;
-    printf("Pila (de arriba hacia abajo):\n");
-    while (actual != NULL) {
-        printf("%s\n", actual->dato);
-        actual = actual->siguiente;
-    }
-    printf("----\n");
-}
-```
-
-## 🚀 Uso en `main()`
-
+### 3. Función Principal (`main`)
 ```c
 int main() {
-    Pila pila;
-    inicializarPila(&pila);
+    Pila miPila;
+    inicializar(&miPila);
 
-    apilar(&pila, "Uno");
-    apilar(&pila, "Dos");
-    apilar(&pila, "Tres");
+    push(&miPila, 10);
+    push(&miPila, 20);
+    push(&miPila, 30);
 
-    imprimirPila(&pila);
-    printf("Cima de la pila: %s\n", cima(&pila));
-    printf("Tamaño de la pila: %d\n", obtenerTamaño(&pila));
-
-    desapilar(&pila);
-    imprimirPila(&pila);
-    printf("Tamaño después de desapilar: %d\n", obtenerTamaño(&pila));
-
-    limpiarPila(&pila);
-    printf("Pila limpiada. ¿Está vacía? %s\n", estaVacia(&pila) ? "Sí" : "No");
+    printf("Elemento en la cima: %d\n", peek(&miPila));
+    printf("Sacando elementos: %d\n", pop(&miPila));
+    printf("Sacando elementos: %d\n", pop(&miPila));
+    printf("Elemento en la cima: %d\n", peek(&miPila));
 
     return 0;
 }
 ```
+En esta función:
+1. Se inicializa la pila.
+2. Se agregan tres elementos (`10`, `20`, `30`).
+3. Se muestra el elemento en la cima.
+4. Se extraen elementos y se imprime el resultado.
 
-## 📌 Ejemplo de Salida
+## Cómo Compilar y Ejecutar
+1. Guarda el código en un archivo, por ejemplo, `pila.c`.
+2. Abre una terminal y compila el código con:
+   ```sh
+   gcc pila.c -o pila
+   ```
+3. Ejecuta el programa con:
+   ```sh
+   ./pila
+   ```
 
-```sh
-Pila (de arriba hacia abajo):
-Tres
-Dos
-Uno
-----
-Cima de la pila: Tres
-Tamaño de la pila: 3
-
-Pila (de arriba hacia abajo):
-Dos
-Uno
-----
-Tamaño después de desapilar: 2
-
-Pila limpiada. ¿Está vacía? Sí
+## Ejemplo de Salida
+```
+Elemento en la cima: 30
+Sacando elementos: 30
+Sacando elementos: 20
+Elemento en la cima: 10
 ```
 
-## 📖 Explicación
+## Conclusión
+Este código implementa una pila en C de manera simple y eficiente, sin depender de archivos de cabecera adicionales. Se incluyen todas las funciones básicas para manejar la estructura de datos tipo LIFO, permitiendo almacenar y gestionar valores enteros de forma estructurada.
 
-1. **Se inicializa** la pila.
-2. **Se apilan** tres elementos (`"Uno"`, `"Dos"`, `"Tres"`).
-3. **Se imprime** la pila y se obtiene la cima.
-4. **Se desapila** un elemento y se vuelve a imprimir.
-5. **Se limpia** la pila y se verifica si está vacía.
+¡Espero que este README te ayude a comprender mejor la implementación! 🚀
 
-## 📜 Notas
-
-- El código usa `malloc()` para la memoria dinámica, por lo que es importante llamar a `limpiarPila()` al final.
-- Se usa `strncpy()` para evitar desbordamientos de buffer.
-- El `#define MAX_LENGTH 100` limita el tamaño de las cadenas almacenadas.
-
-##
